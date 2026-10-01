@@ -9,7 +9,8 @@ module top_module(
         PENDING_START = 2'b00,
         PENDING_STOP  = 2'b01,
         PENDING_BITS  = 2'b10;
-    reg state, next_state;
+    reg [1:0]
+        state, next_state;
     reg [31:0]
         cnt;
     reg byte_ac;
@@ -23,7 +24,7 @@ module top_module(
             PENDING_START:
                 next_state = (in) ? state : PENDING_BITS;
             PENDING_BITS:
-                next_state = (cnt > 6) ? PENDING_STOP : state;
+                next_state = (cnt > 7) ? PENDING_STOP : state;
             PENDING_STOP:
                 next_state = (in) ? PENDING_START : state;  
             default:;
@@ -35,17 +36,18 @@ module top_module(
     begin
         if(reset)
         begin
-            state <= PENDING_START;
-            cnt   <= 0;
+            state   <= PENDING_START;
+            cnt     <= 0;
+            byte_ac <= 0;
         end
         else
         begin
+            byte_ac <= ((next_state == PENDING_START) && (cnt == 9)) ? 1 : 0;
+
             if(next_state != PENDING_START)
-                cnt++;
+                cnt = cnt + 1;
             else//PENDING_START
                 cnt = 0;
-
-            byte_ac <= ((next_state == PENDING_START) && (cnt == 9)) ? 1 : 0; 
 
             state <= next_state;
         end
