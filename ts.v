@@ -105,9 +105,7 @@ module top_module();
     wire aaah;
     wire digging;
 
-    // ------------------------------------------------------------
     // DUT
-    // ------------------------------------------------------------
     lem4 dut (
         .clk        (clk),
         .areset     (areset),
@@ -121,14 +119,11 @@ module top_module();
         .digging    (digging)
     );
 
-    // 10-time-unit clock
     initial clk = 0;
     initial `probe_start;
     always #5 clk = ~clk;
 
-    // ------------------------------------------------------------
-    // Timing diagram
-    // ------------------------------------------------------------
+    // Timing Diagram - IN
     `probe(clk);
     `probe(areset);
     `probe(bump_left);
@@ -136,21 +131,19 @@ module top_module();
     `probe(ground);
     `probe(dig);
 
-    // Outputs
+    // Timing Diagram = OUT
     `probe(walk_left);
     `probe(walk_right);
     `probe(aaah);
     `probe(digging);
 
-    // Internal FSM signals -- very useful for debugging
+    // Internal FSM signals
     `probe(dut.state);
     `probe(dut.next_state);
     `probe(dut.last_dir);
     `probe(dut.fall_cnt);
 
-    // ------------------------------------------------------------
-    // Test stimulus
-    // ------------------------------------------------------------
+    // Stimuli
     initial begin
 
         // Initial values
@@ -184,23 +177,6 @@ module top_module();
         @(negedge clk);
         bump_right = 0;
 
-        // ========================================================
-        // TEST 3:
-        // LEFT -> FALL -> LEFT
-        // Fall for <= 20 cycles, then ground returns.
-        // ========================================================
-        @(negedge clk);
-        ground = 0;
-
-        // Hold ground low for 10 clocks
-        repeat (10)
-            @(negedge clk);
-
-        ground = 1;
-
-        // Give FSM a little time to recover
-        repeat (2)
-            @(negedge clk);
 
         // ========================================================
         // TEST 4:
@@ -223,6 +199,45 @@ module top_module();
         repeat (2)
             @(negedge clk);
 
+        // Splatter test
+        @(negedge clk);
+        ground = 0;
+
+        repeat (19)
+            @(negedge clk);
+
+        // Ground returns after >20 falling cycles
+        ground = 1;
+        // Splatter test
+        // Give FSM a little time to recover
+        repeat (2)
+            @(negedge clk);
+        // Splatter test
+        @(negedge clk);
+        ground = 0;
+
+        repeat (20)
+            @(negedge clk);
+
+        // Ground returns after >20 falling cycles
+        ground = 1;
+        // Splatter test
+        // Give FSM a little time to recover
+        repeat (2)
+            @(negedge clk);
+        // Splatter test
+        @(negedge clk);
+        ground = 0;
+
+        repeat (21)
+            @(negedge clk);
+
+        // Ground returns after >20 falling cycles
+        ground = 1;
+        // Splatter test
+        // Give FSM a little time to recover
+        repeat (2)
+            @(negedge clk);
         // ========================================================
         // TEST 5:
         // LONG FALL -> DEAD

@@ -20,7 +20,7 @@ module top_module(
 
     reg [2:0]
         state, next_state, last_dir;
-    reg [4:0]
+    reg [31:0]
         fall_cnt;
 
     // State transition logic
