@@ -12,6 +12,8 @@ module top_module(
     reg state, next_state;
     reg [1:0]
         byte_cnt;
+    reg [23:0]
+        out_buf;
 
     // State transition logic (combinational)
     always @(*)
@@ -42,13 +44,16 @@ module top_module(
                 byte_cnt = 1;
             else
                 byte_cnt = 0;
+    
+            if(byte_cnt > 0)
+                //out[23:16,15:8,7:0]
+                out_buf[(4 - byte_cnt) * 8 - 1 -: 8] <= in;
+            else;
 
             state <= next_state;
         end
     end
 
-    assign done = (byte_cnt > 2) ? 1 : 0;
-    if(byte_cnt > 0)
-        assign out_bytes[(byte_cnt - 1) * 8 +: 8] = in;
-    else;
+    assign done      = (byte_cnt > 2) ? 1 : 0;
+    assign out_bytes = out_buf;
 endmodule
