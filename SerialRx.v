@@ -12,6 +12,7 @@ module top_module(
     reg state, next_state;
     reg [31:0]
         cnt;
+    reg byte_ac;
     
     // State transition logic (combinational)
     always @(*)
@@ -22,7 +23,7 @@ module top_module(
             PENDING_START:
                 next_state = (in) ? state : PENDING_BITS;
             PENDING_BITS:
-                next_state = (cnt > 7) : PENDING_STOP : state;
+                next_state = (cnt > 6) ? PENDING_STOP : state;
             PENDING_STOP:
                 next_state = (in) ? PENDING_START : state;  
             default:;
@@ -41,12 +42,14 @@ module top_module(
         begin
             if(next_state != PENDING_START)
                 cnt++;
-            else
+            else//PENDING_START
                 cnt = 0;
+
+            byte_ac <= ((next_state == PENDING_START) && (cnt == 9)) ? 1 : 0; 
 
             state <= next_state;
         end
     end
 
-    assign done = ((cnt < 10) && (next_state == PENDING_START)) ? 1 : 0;
+    assign done = byte_ac ? 1 : 0;
 endmodule
