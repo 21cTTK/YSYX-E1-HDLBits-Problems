@@ -20,7 +20,9 @@ module top_module(
         if (state == IDLE)
             next_state = in[3] ? RX : IDLE;
         else// (state == RX)
-            next_state = (byte_cnt > 2) ? IDLE : RX;
+            next_state = (
+                            (byte_cnt > 2) && (in[3] != 1)
+                         ) ? IDLE : RX;
     end
 
     // State flip-flops (sequential)
@@ -32,8 +34,11 @@ module top_module(
         end
         else
         begin
-            if(next_state == RX)
+            if((next_state == RX) &&
+               (byte_cnt < 3))
                 byte_cnt++;
+            else if(in[3] == 1)
+                byte_cnt = 1;
             else
                 byte_cnt = 0;
 
