@@ -9,12 +9,12 @@ module top_module (
         edged,
         last_in;
 
-    always @(posedge clk, posedge reset)
+    always @(posedge clk)
     begin
         if(reset)
             edged <= 0;
         else
-            edged <= (~in & last_in) ? 1 : edged;
+            edged <= edged | (last_in & ~in);
         
         last_in <= in;
     end
