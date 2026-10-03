@@ -11,8 +11,7 @@ module top_module (
         C = 2'b10; // pending 10'1'
     reg [1:0]
         curr_state,
-        next_state,
-        last_state;
+        next_state;
 
     always @(*)
     begin
@@ -26,20 +25,13 @@ module top_module (
         endcase
     end
 
-    always @(posedge clk, posedge aresetn)
+    always @(posedge clk, negedge aresetn)
     begin
         if(!aresetn)
-        begin
             curr_state <= A;
-            last_state <= A;
-            next_state <= A;
-        end
         else
-        begin
             curr_state <= next_state;
-            last_state <= curr_state;
-        end
     end
 
-    assign z = (curr_state == B) && (last_state == C);
+    assign z = (curr_state == C) && (x == 1);
 endmodule
